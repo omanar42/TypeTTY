@@ -9,7 +9,7 @@ jobs:
   test:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Set up Rust
         run: |
           rustup update stable
@@ -27,4 +27,3 @@ jobs:
           sh tests/install_test.sh
       - name: Build release binary
         run: cargo build --release --locked
-

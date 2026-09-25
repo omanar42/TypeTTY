@@ -1,7 +1,7 @@
 #!/bin/sh
 set -eu
 
-project_dir="$(CDPATH= cd -- "$(dirname "$0")/.." && pwd)"
+project_dir="$(CDPATH='' cd -- "$(dirname "$0")/.." && pwd)"
 test_root="$(mktemp -d "${TMPDIR:-/tmp}/typetty-install-test.XXXXXX")"
 trap 'rm -rf "$test_root"' EXIT HUP INT TERM
 
@@ -32,7 +32,7 @@ WPM_RELEASE_BASE_URL="file://$test_root/releases" \
 
 test -x "$test_root/home/.local/bin/wpm"
 test "$("$test_root/home/.local/bin/wpm")" = "wpm test binary"
-grep -F 'export PATH="$HOME/.local/bin:$PATH"' "$test_root/home/.zshrc" >/dev/null
+grep -F "export PATH=\"\$HOME/.local/bin:\$PATH\"" "$test_root/home/.zshrc" >/dev/null
 
 # A second run must not duplicate the shell configuration entry.
 HOME="$test_root/home" \
@@ -46,4 +46,3 @@ WPM_RELEASE_BASE_URL="file://$test_root/releases" \
 
 test "$(grep -c '# TypeTTY' "$test_root/home/.zshrc")" -eq 1
 printf 'installer tests passed\n'
-

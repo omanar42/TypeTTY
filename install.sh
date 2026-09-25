@@ -80,7 +80,7 @@ if [ -z "${WPM_SKIP_PATH_UPDATE:-}" ] && [ "$install_dir" = "$HOME/.local/bin" ]
       if ! grep -F '.local/bin' "$shell_file" >/dev/null 2>&1; then
         {
           printf '\n# TypeTTY\n'
-          printf '%s\n' 'export PATH="$HOME/.local/bin:$PATH"'
+          printf '%s\n' "export PATH=\"\$HOME/.local/bin:\$PATH\""
         } >>"$shell_file"
         path_updated=true
       fi

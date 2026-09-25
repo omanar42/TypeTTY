@@ -24,7 +24,7 @@ jobs:
             target: aarch64-unknown-linux-musl
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Set up Rust target
         run: |
           rustup update stable
@@ -72,4 +72,3 @@ jobs:
           --repo "$GITHUB_REPOSITORY"
           --title "TypeTTY $GITHUB_REF_NAME"
           --generate-notes
-
