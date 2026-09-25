@@ -1,0 +1,75 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-15-intel
+            target: x86_64-apple-darwin
+          - os: macos-15
+            target: aarch64-apple-darwin
+          - os: ubuntu-24.04
+            target: x86_64-unknown-linux-musl
+          - os: ubuntu-24.04-arm
+            target: aarch64-unknown-linux-musl
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Rust target
+        run: |
+          rustup update stable
+          rustup default stable
+          rustup target add "${{ matrix.target }}"
+      - name: Install musl tools
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y musl-tools
+      - name: Test
+        run: cargo test --locked
+      - name: Build
+        run: cargo build --release --locked --target "${{ matrix.target }}"
+      - name: Package
+        shell: bash
+        run: |
+          asset="wpm-${{ matrix.target }}.tar.gz"
+          tar -C "target/${{ matrix.target }}/release" -czf "$asset" wpm
+          if command -v sha256sum >/dev/null 2>&1; then
+            sha256sum "$asset" >"$asset.sha256"
+          else
+            shasum -a 256 "$asset" >"$asset.sha256"
+          fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wpm-${{ matrix.target }}
+          path: |
+            wpm-${{ matrix.target }}.tar.gz
+            wpm-${{ matrix.target }}.tar.gz.sha256
+
+  publish:
+    needs: build
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+      - name: Publish GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >-
+          gh release create "$GITHUB_REF_NAME" dist/*
+          --repo "$GITHUB_REPOSITORY"
+          --title "TypeTTY $GITHUB_REF_NAME"
+          --generate-notes
+

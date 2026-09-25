@@ -1,0 +1,32 @@
+[package]
+name = "typetty"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.74"
+description = "A fast, focused typing test for your terminal"
+license = "MIT"
+repository = "https://github.com/omanar42/TypeTTY"
+readme = "README.md"
+keywords = ["typing", "terminal", "wpm", "tui"]
+categories = ["command-line-utilities"]
+
+[[bin]]
+name = "wpm"
+path = "src/main.rs"
+
+[dependencies]
+clap = { version = "4.5", features = ["derive"] }
+crossterm = "0.28"
+instability = "=0.3.7"
+rand = "0.8"
+ratatui = "0.29"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+[dev-dependencies]
+tempfile = "3.13"
+
+[profile.release]
+lto = true
+codegen-units = 1
+strip = true
